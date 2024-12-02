@@ -58,9 +58,9 @@
           <configuration>
             <jdbc>
                 <driver>org.postgresql.Driver</driver>
-                <url>jdbc:postgresql://1.94.245.159:8000/test</url>
-                <user>postgres_cdc</user>
-                <password>Postgres@123</password>
+                <url>jdbc:postgresql://localhost:8000/test</url>
+                <user>username</user>
+                <password>password</password>
             </jdbc>
             <generator>
               <generate>
