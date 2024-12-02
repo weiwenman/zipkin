@@ -164,6 +164,14 @@ zipkin:
       db: ${MYSQL_DB:zipkin}
       max-active: ${MYSQL_MAX_CONNECTIONS:10}
       use-ssl: ${MYSQL_USE_SSL:false}
+    gaussdb:
+      jdbc-url: ${GAUSSDB_JDBC_URL:}
+      host: ${GAUSSDB_HOST:localhost}
+      port: ${GAUSSDB_TCP_PORT:8000}
+      username: ${GAUSSDB_USER:}
+      password: ${GAUSSDB_PASS:}
+      db: ${GAUSSDB_DB:test}
+      driver-class-name: ${GAUSSDB_DRIVER:}
   ui:
     enabled: ${UI_ENABLED:${QUERY_ENABLED:true}}
     ## Values below here are mapped to ZipkinUiProperties, served as /config.json
