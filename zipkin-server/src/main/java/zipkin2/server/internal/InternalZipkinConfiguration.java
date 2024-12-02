@@ -11,6 +11,7 @@ import zipkin2.server.internal.brave.ZipkinSelfTracingConfiguration;
 import zipkin2.server.internal.cassandra3.ZipkinCassandra3StorageConfiguration;
 import zipkin2.server.internal.elasticsearch.ZipkinElasticsearchStorageConfiguration;
 import zipkin2.server.internal.eureka.ZipkinEurekaDiscoveryConfiguration;
+import zipkin2.server.internal.gaussdb.ZipkinGaussDBStorageConfiguration;
 import zipkin2.server.internal.health.ZipkinHealthController;
 import zipkin2.server.internal.kafka.ZipkinKafkaCollectorConfiguration;
 import zipkin2.server.internal.mysql.ZipkinMySQLStorageConfiguration;
@@ -28,6 +29,7 @@ import zipkin2.server.internal.ui.ZipkinUiConfiguration;
   ZipkinCassandra3StorageConfiguration.class,
   ZipkinElasticsearchStorageConfiguration.class,
   ZipkinMySQLStorageConfiguration.class,
+  ZipkinGaussDBStorageConfiguration.class,
   ZipkinScribeCollectorConfiguration.class,
   ZipkinSelfTracingConfiguration.class,
   ZipkinQueryApiV2.class,
