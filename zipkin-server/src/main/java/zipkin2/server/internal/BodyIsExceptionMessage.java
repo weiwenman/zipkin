@@ -19,6 +19,7 @@ import static com.linecorp.armeria.common.MediaType.ANY_TEXT_TYPE;
 
 final class BodyIsExceptionMessage implements ExceptionHandlerFunction {
   static final Logger LOGGER = LoggerFactory.getLogger(BodyIsExceptionMessage.class);
+
   @Override
   public HttpResponse handleException(ServiceRequestContext ctx, HttpRequest req, Throwable cause) {
     if (req.method() == HttpMethod.POST && req.path().startsWith("/api/v")) {
@@ -32,6 +33,7 @@ final class BodyIsExceptionMessage implements ExceptionHandlerFunction {
     } else {
       // Don't fill logs with exceptions about closed components.
       if (!(cause instanceof ClosedComponentException)) {
+        cause.printStackTrace();
         LOGGER.warn("Unexpected error handling {} {}", req.method(), req.path());
       }
 

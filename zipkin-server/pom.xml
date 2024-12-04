@@ -239,7 +239,7 @@
     <!-- GaussDB backend -->
     <dependency>
       <groupId>io.zipkin.zipkin2</groupId>
-      <artifactId>zipkin-storage-gaussdb-v1</artifactId>
+      <artifactId>zipkin-storage-gaussdb-v2</artifactId>
       <version>${project.version}</version>
       <optional>true</optional>
     </dependency>
@@ -338,7 +338,6 @@
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>${gson.version}</version>
-      <scope>test</scope>
     </dependency>
 
     <dependency>

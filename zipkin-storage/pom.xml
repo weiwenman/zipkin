@@ -27,7 +27,7 @@
     <module>cassandra</module>
     <module>mysql-v1</module>
     <module>elasticsearch</module>
-    <module>gaussdb-v1</module>
+    <module>gaussdb-v2</module>
   </modules>
 
   <dependencies>

@@ -39,7 +39,7 @@ class ZipkinSelfTracingGaussDBStorageConfiguration extends DefaultExecuteListene
   }
 
   @Bean
-  Executor mysqlExecutor() {
+  Executor gaussDBExecutor() {
     return makeContextAware(
       new ZipkinGaussDBStorageConfiguration().gaussDBExecutor(),
       currentTraceContext
@@ -74,7 +74,7 @@ class ZipkinSelfTracingGaussDBStorageConfiguration extends DefaultExecuteListene
     int spaceIndex = sql.indexOf(' '); // Allow span names of single-word statements like COMMIT
     span.kind(Span.Kind.CLIENT).name(spaceIndex == -1 ? sql : sql.substring(0, spaceIndex));
     span.tag("sql.query", sql);
-    span.remoteServiceName("mysql");
+    span.remoteServiceName("gaussdb");
     span.remoteIpAndPort(gaussdb.getHost(), gaussdb.getPort());
     span.start();
   }

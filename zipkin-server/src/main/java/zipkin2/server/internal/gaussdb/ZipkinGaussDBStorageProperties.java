@@ -24,6 +24,7 @@ class ZipkinGaussDBStorageProperties implements Serializable { // for Spark jobs
   private String password;
   private String driverClassName = "org.postgresql.Driver";
   private String db = "zipkin";
+  private String schema = "public";
   private int maxActive = 10;
   private boolean useSsl;
 
@@ -99,6 +100,14 @@ class ZipkinGaussDBStorageProperties implements Serializable { // for Spark jobs
     this.useSsl = useSsl;
   }
 
+  public String getSchema() {
+    return schema;
+  }
+
+  public void setSchema(String schema) {
+    this.schema = schema;
+  }
+
   public DataSource toDataSource() {
     HikariDataSource result = new HikariDataSource();
     result.setDriverClassName(getDriverClassName());
@@ -106,6 +115,7 @@ class ZipkinGaussDBStorageProperties implements Serializable { // for Spark jobs
     result.setMaximumPoolSize(getMaxActive());
     result.setUsername(getUsername());
     result.setPassword(getPassword());
+    result.setSchema(getSchema());
     return result;
   }
 
@@ -115,7 +125,7 @@ class ZipkinGaussDBStorageProperties implements Serializable { // for Spark jobs
     }
 
     return "jdbc:postgresql://"
-        + getHost() + ":" + getPort()
-        + "/" + getDb();
+      + getHost() + ":" + getPort()
+      + "/" + getDb();
   }
 }

@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import zipkin2.storage.StorageComponent;
-import zipkin2.storage.gaussdb.v1.GaussDBStorage;
+import zipkin2.storage.gaussdb.v2.GaussDBStorage;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -48,7 +48,7 @@ public class ZipkinGaussDBStorageConfiguration {
   }
 
   @Bean
-  StorageComponent storage(
+  StorageComponent gaussDBStorage(
     Executor gaussDBExecutor,
     DataSource gaussDBDataSource,
     @Value("${zipkin.storage.strict-trace-id:true}") boolean strictTraceId,
