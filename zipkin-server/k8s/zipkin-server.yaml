@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zipkin-server
+  labels:
+    app: zipkin-server-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zipkin-server-pods
+  template:
+    metadata:
+      name: zipkin-server
+      labels:
+        app: zipkin-server-pods
+    spec:
+      containers:
+        - name: zipkin-server-container
+          image: swr.cn-north-4.myhuaweicloud.com/xxx/zipkin-server:0.0.1
+          env:
+            - name: ZIPKIN-SERVER
+              value: zipkin-server
+            - name: STORAGE_TYPE
+              value: gaussdb
+            - name: DB_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_PASSWORD
+                  name: opengauss
+            - name: DB_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_URL
+                  name: opengauss
+            - name: DB_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_USERNAME
+                  name: opengauss
+            - name: DB_DRIVER
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_DRIVER
+                  name: opengauss
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9411
+              protocol: TCP
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+      imagePullSecrets:
+        - name: default-secret
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zipkin-server
+spec:
+  selector:
+    app: zipkin-server-pods
+  ports:
+    - protocol: TCP
+      port: 9441
+      targetPort: 9441
+  type: NodePort
