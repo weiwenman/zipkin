@@ -16,14 +16,11 @@ import zipkin2.storage.SpanConsumer;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import static zipkin2.storage.gaussdb.v2.internal.generated.tables.ZipkinAnnotations.ZIPKIN_ANNOTATIONS;
-import static zipkin2.storage.gaussdb.v2.internal.generated.tables.ZipkinDependencies.ZIPKIN_DEPENDENCIES;
 import static zipkin2.storage.gaussdb.v2.internal.generated.tables.ZipkinSpans.ZIPKIN_SPANS;
 
 final class GaussDBSpanConsumer implements SpanConsumer {
@@ -66,14 +63,15 @@ final class GaussDBSpanConsumer implements SpanConsumer {
               .returning(ZIPKIN_SPANS.SPAN_ID)
               .fetchOne())
             .getValue(ZIPKIN_SPANS.SPAN_ID);
-          LOG.info("begin accept trace data:" + span);
+          LOG.info(">>>>>>>>> accept trace data:" + span);
         } else {
           spanId = record.getValue(ZIPKIN_SPANS.SPAN_ID);
+          LOG.info("========= throw trace data:" + span);
         }
 
         if (Objects.nonNull(span.parentId())) {
           String sql = "insert into zipkin_dependencies values(?,?,?,?,?) on duplicate key update nothing";
-          int rs = ctx.execute(sql,
+          ctx.execute(sql,
             LocalDate.now(),
             span.parentId(),
             span.traceId(),

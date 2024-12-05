@@ -41,9 +41,11 @@ final class Schema {
     dependencyLinkFields = list(ZIPKIN_DEPENDENCIES.fields());
     dependencyLinkerFields =
       list(
+        ZIPKIN_SPANS.SPAN_ID,
         ZIPKIN_SPANS.ID,
         ZIPKIN_SPANS.TRACE_ID,
         ZIPKIN_SPANS.PARENT_ID,
+        ZIPKIN_ANNOTATIONS.SPAN_ID,
         ZIPKIN_ANNOTATIONS.A_KEY,
         ZIPKIN_ANNOTATIONS.A_TYPE,
         ZIPKIN_ANNOTATIONS.SERVICE_NAME);

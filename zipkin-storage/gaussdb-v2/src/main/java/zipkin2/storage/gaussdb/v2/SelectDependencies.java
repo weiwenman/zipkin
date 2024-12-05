@@ -10,9 +10,7 @@ import zipkin2.DependencyLink;
 import zipkin2.Span;
 import zipkin2.internal.DependencyLinker;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
@@ -28,21 +26,33 @@ record SelectDependencies(Schema schema, List<Long> epochDays) implements Functi
   @Override
   public List<DependencyLink> apply(DSLContext context) {
     LOG.info("begin select dependencies data");
-    return test(context);
-//    List<DependencyLink> unmerged =
-//      context
-//        .select(schema.dependencyLinkFields)
-//        .from(ZIPKIN_DEPENDENCIES)
-//        .where(ZIPKIN_DEPENDENCIES.DAY.in(epochDays))
-//        .fetch(
-//          (Record l) ->
-//            DependencyLink.newBuilder()
-//              .parent(l.get(ZIPKIN_DEPENDENCIES.PARENT))
-//              .child(l.get(ZIPKIN_DEPENDENCIES.CHILD))
-//              .callCount(l.get(ZIPKIN_DEPENDENCIES.CALL_COUNT))
-//              .errorCount(maybeGet(l, ZIPKIN_DEPENDENCIES.ERROR_COUNT, 0L))
-//              .build());
-//    return DependencyLinker.merge(unmerged);
+    Result<Record2<String, String>> fetch = context.selectDistinct(ZIPKIN_SPANS.TRACE_ID, ZIPKIN_ANNOTATIONS.SERVICE_NAME)
+      .from(ZIPKIN_SPANS.leftJoin(ZIPKIN_ANNOTATIONS)
+        .on(ZIPKIN_SPANS.SPAN_ID.eq(ZIPKIN_ANNOTATIONS.SPAN_ID)))
+      .fetch();
+    Map<String, String> map = new HashMap<>();
+    for (Record2<String, String> record2 : fetch) {
+      map.put(record2.get(ZIPKIN_SPANS.TRACE_ID), record2.get(ZIPKIN_ANNOTATIONS.SERVICE_NAME));
+    }
+    List<DependencyLink> unmerged = context.select(schema.dependencyLinkFields)
+      .from(ZIPKIN_DEPENDENCIES)
+      .where(ZIPKIN_DEPENDENCIES.DAY.in(epochDays))
+      .fetch((Record l) -> {
+          DependencyLink.Builder builder = DependencyLink.newBuilder();
+          if (map.containsKey(l.get(ZIPKIN_DEPENDENCIES.PARENT))) {
+            builder = builder.parent(map.get(l.get(ZIPKIN_DEPENDENCIES.PARENT)));
+          }
+          if (map.containsKey(l.get(ZIPKIN_DEPENDENCIES.CHILD))) {
+            builder = builder.child(map.get(l.get(ZIPKIN_DEPENDENCIES.CHILD)));
+          }
+          builder.callCount(l.get(ZIPKIN_DEPENDENCIES.CALL_COUNT))
+            .errorCount(maybeGet(l, ZIPKIN_DEPENDENCIES.ERROR_COUNT, 0L))
+            .build();
+          return builder.build();
+        }
+      );
+    LOG.info("" + unmerged);
+    return DependencyLinker.merge(unmerged);
   }
 
   public List<DependencyLink> test(DSLContext context) {
@@ -55,9 +65,9 @@ record SelectDependencies(Schema schema, List<Long> epochDays) implements Functi
       // special annotations. We need all span ids to reconstruct the trace tree. We need
       // the whole trace tree so that we can accurately skip local spans.
       .from(ZIPKIN_SPANS.leftJoin(ZIPKIN_ANNOTATIONS)
-        // NOTE: we are intentionally grouping only on the low-bits of trace id. This
-        // buys time for applications to upgrade to 128-bit instrumentation.
-        .on(ZIPKIN_SPANS.SPAN_ID.eq(ZIPKIN_ANNOTATIONS.SPAN_ID))
+          // NOTE: we are intentionally grouping only on the low-bits of trace id. This
+          // buys time for applications to upgrade to 128-bit instrumentation.
+          .on(ZIPKIN_SPANS.SPAN_ID.eq(ZIPKIN_ANNOTATIONS.SPAN_ID))
 //        .and(ZIPKIN_ANNOTATIONS.A_KEY.in("lc", "cs", "ca", "sr", "sa", "ma", "mr", "ms", "error"))
       )
       .where(ZIPKIN_SPANS.TRACE_ID.in(traceIDs))
